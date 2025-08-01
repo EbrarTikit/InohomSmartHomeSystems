@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.inohomsmarthomesystems.R
 import com.example.inohomsmarthomesystems.databinding.FragmentSplashBinding
+import com.example.inohomsmarthomesystems.ui.login.LoginFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -44,7 +45,14 @@ class SplashFragment : Fragment() {
     }
     
     private fun navigateToNextScreen() {
-        findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
+        try {
+            findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
+        } catch (e: Exception) {
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, LoginFragment())
+                .addToBackStack(null)
+                .commit()
+        }
     }
 
     override fun onDestroyView() {
