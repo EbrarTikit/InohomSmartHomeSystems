@@ -18,6 +18,7 @@ import com.example.inohomsmarthomesystems.utils.state.UIState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import com.example.inohomsmarthomesystems.utils.state.ConnectionState
 
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
@@ -91,16 +92,16 @@ class LoginFragment : Fragment() {
         }
     }
 
-    private fun handleConnectionState(state: WebSocketService.ConnectionState) {
+    private fun handleConnectionState(state: ConnectionState) {
         when (state) {
-            WebSocketService.ConnectionState.CONNECTED -> {
+            ConnectionState.CONNECTED -> {
                 binding.btnAccounts.text = getString(R.string.authenticating)
             }
-            WebSocketService.ConnectionState.ERROR -> {
+            ConnectionState.ERROR -> {
                 binding.btnAccounts.isEnabled = true
                 binding.btnAccounts.text = getString(R.string.accounts)
             }
-            WebSocketService.ConnectionState.DISCONNECTED -> {
+            ConnectionState.DISCONNECTED -> {
                 binding.btnAccounts.isEnabled = true
                 binding.btnAccounts.text = getString(R.string.accounts)
             }

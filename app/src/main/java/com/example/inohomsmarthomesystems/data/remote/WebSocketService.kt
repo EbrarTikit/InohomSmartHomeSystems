@@ -13,19 +13,15 @@ import org.java_websocket.framing.Framedata
 import java.net.URI
 import javax.inject.Inject
 import javax.inject.Singleton
+import com.example.inohomsmarthomesystems.utils.Constants
+import com.example.inohomsmarthomesystems.utils.Constants.SERVER_IP
+import com.example.inohomsmarthomesystems.utils.Constants.SERVER_PORT
+import com.example.inohomsmarthomesystems.utils.Constants.SERVER_URL
+import com.example.inohomsmarthomesystems.utils.Constants.TAG
+import com.example.inohomsmarthomesystems.utils.state.ConnectionState
 
 @Singleton
 class WebSocketService @Inject constructor() {
-    
-    companion object {
-        private const val TAG = "WebSocketService"
-        private const val SERVER_IP = "85.105.107.53"
-        private const val SERVER_PORT = 9095
-
-        //private const val SERVER_URL = "ws://$SERVER_IP:$SERVER_PORT"
-        private const val SERVER_URL = "wss://echo.websocket.org"
-    }
-    
     private var webSocketClient: WebSocketClient? = null
     private val gson = Gson()
     private val _connectionState = MutableStateFlow(ConnectionState.DISCONNECTED)
@@ -182,11 +178,5 @@ class WebSocketService @Inject constructor() {
             Log.e(TAG, "Network bağlantısı başarısız: ${e.message}")
             Log.e(TAG, "Server $SERVER_IP:$SERVER_PORT erişilemez")
         }
-    }
-
-    enum class ConnectionState {
-        CONNECTED,
-        DISCONNECTED,
-        ERROR
     }
 } 

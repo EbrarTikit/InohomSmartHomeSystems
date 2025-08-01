@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.inohomsmarthomesystems.data.remote.WebSocketService
 import com.example.inohomsmarthomesystems.data.model.AuthenticationResponse
+import com.example.inohomsmarthomesystems.utils.state.ConnectionState
 import com.example.inohomsmarthomesystems.utils.state.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,8 +21,8 @@ class LoginViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<UIState<String>>(UIState.Idle)
     val uiState: StateFlow<UIState<String>> = _uiState
     
-    private val _connectionState = MutableStateFlow(WebSocketService.ConnectionState.DISCONNECTED)
-    val connectionState: StateFlow<WebSocketService.ConnectionState> = _connectionState
+    private val _connectionState = MutableStateFlow(ConnectionState.DISCONNECTED)
+    val connectionState: StateFlow<ConnectionState> = _connectionState
     
     init {
         viewModelScope.launch {
@@ -48,15 +49,15 @@ class LoginViewModel @Inject constructor(
         webSocketService.connect()
     }
 
-    private fun handleConnectionStateChange(state: WebSocketService.ConnectionState) {
+    private fun handleConnectionStateChange(state: ConnectionState) {
         when (state) {
-            WebSocketService.ConnectionState.CONNECTED -> {
+            ConnectionState.CONNECTED -> {
                 webSocketService.sendAuthenticationRequest("demo", "123456")
             }
-            WebSocketService.ConnectionState.ERROR -> {
+            ConnectionState.ERROR -> {
                 _uiState.value = UIState.Error("WebSocket bağlantı hatası")
             }
-            WebSocketService.ConnectionState.DISCONNECTED -> {
+            ConnectionState.DISCONNECTED -> {
                 if (_uiState.value is UIState.Loading) {
                     _uiState.value = UIState.Error("Bağlantı kesildi")
                 }
