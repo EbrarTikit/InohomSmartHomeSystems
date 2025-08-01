@@ -2,4 +2,7 @@
     <string name="app_name">InohomSmartHomeSystems</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="splash_logo">splash_logo</string>
+    <string name="v_1_7_0">V.1.7.0</string>
+    <string name="v170">v.1.7.0</string>
 </resources>
