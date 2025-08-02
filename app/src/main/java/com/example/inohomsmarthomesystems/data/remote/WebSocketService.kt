@@ -4,21 +4,19 @@ import android.util.Log
 import com.example.inohomsmarthomesystems.data.model.AuthenticationRequest
 import com.example.inohomsmarthomesystems.data.model.AuthenticationResponse
 import com.example.inohomsmarthomesystems.data.model.LoginParams
-import com.google.gson.Gson
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import org.java_websocket.client.WebSocketClient
-import org.java_websocket.handshake.ServerHandshake
-import org.java_websocket.framing.Framedata
-import java.net.URI
-import javax.inject.Inject
-import javax.inject.Singleton
-import com.example.inohomsmarthomesystems.utils.Constants
 import com.example.inohomsmarthomesystems.utils.Constants.SERVER_IP
 import com.example.inohomsmarthomesystems.utils.Constants.SERVER_PORT
 import com.example.inohomsmarthomesystems.utils.Constants.SERVER_URL
 import com.example.inohomsmarthomesystems.utils.Constants.TAG
 import com.example.inohomsmarthomesystems.utils.state.ConnectionState
+import com.google.gson.Gson
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import org.java_websocket.client.WebSocketClient
+import org.java_websocket.handshake.ServerHandshake
+import java.net.URI
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 class WebSocketService @Inject constructor() {
@@ -31,7 +29,7 @@ class WebSocketService @Inject constructor() {
     val authenticationResponse: StateFlow<AuthenticationResponse?> = _authenticationResponse
     
 
-    //WebSocket bağlantısını başlatıyoruz
+    // WebSocket bağlantısını kurar ve eventleri handle eder
     fun connect() {
         try {
             Log.d(TAG, "WebSocket bağlantısı başlatılıyor: $SERVER_URL")
@@ -39,17 +37,19 @@ class WebSocketService @Inject constructor() {
             testNetworkConnection()
             
             webSocketClient = object : WebSocketClient(URI(SERVER_URL)) {
-                
+
+                // Bağlantı açıldığında tetiklenir, connection state güncellenir
                 override fun onOpen(handshakedata: ServerHandshake?) {
                     Log.d(TAG, "WebSocket bağlantısı açıldı - Status: ${handshakedata?.httpStatus}, StatusMessage: ${handshakedata?.httpStatusMessage}")
                     _connectionState.value = ConnectionState.CONNECTED
                 }
-                
+
+                // Mesaj geldiğinde handleMessage fonksiyonu çağrılır
                 override fun onMessage(message: String?) {
                     Log.d(TAG, "WebSocket mesajı alındı: $message")
                     message?.let { handleMessage(it) }
                 }
-                
+
                 override fun onClose(code: Int, reason: String?, remote: Boolean) {
                     Log.d(TAG, "WebSocket bağlantısı kapandı: code=$code, reason=$reason, remote=$remote")
                     
@@ -73,7 +73,7 @@ class WebSocketService @Inject constructor() {
                 }
             }
 
-            webSocketClient?.connectionLostTimeout = 10
+            webSocketClient?.connectionLostTimeout = 20
             
             // Bağlantıyı başlatır
             Log.d(TAG, "WebSocket connect() çağrılıyor...")
@@ -93,7 +93,7 @@ class WebSocketService @Inject constructor() {
         _connectionState.value = ConnectionState.DISCONNECTED
     }
 
-    //Authentication request gönderiyoruz
+    // Authentication (login) request'ini gönderir
     fun sendAuthenticationRequest(username: String, password: String) {
         try {
             val request = AuthenticationRequest(
@@ -111,18 +111,11 @@ class WebSocketService @Inject constructor() {
             Log.e(TAG, "Authentication request gönderme hatası: ${e.message}")
         }
     }
-    
 
-    // Gelen json mesajı
+    //Gelen tüm json mesajları parse eder
     private fun handleMessage(message: String) {
         try {
             Log.d(TAG, "Mesaj işleniyor: $message")
-            
-            // Echo server test için özel kontrol
-            if (SERVER_URL.contains("echo.websocket.org")) {
-                handleEchoServerMessage(message)
-                return
-            }
             
             val response = gson.fromJson(message, AuthenticationResponse::class.java)
             
@@ -141,31 +134,6 @@ class WebSocketService @Inject constructor() {
         }
     }
     
-  // Echo server mesajlarını işler
-    private fun handleEchoServerMessage(message: String) {
-        try {
-            Log.d(TAG, "Echo server mesajı alındı, authentication simüle ediliyor")
-            
-            // Mock authentication response oluştur
-            val mockResponse = AuthenticationResponse(
-                id = 792,
-                params = listOf("demo"),
-                method = "OnAuthenticated",
-                error = null,
-                isRequest = true
-            )
-            
-            Log.d(TAG, "Mock authentication response: ${gson.toJson(mockResponse)}")
-            _authenticationResponse.value = mockResponse
-            
-        } catch (e: Exception) {
-            Log.e(TAG, "Echo server mesaj işleme hatası: ${e.message}")
-        }
-    }
-    
-    /**
-     * Network bağlantısını test eder
-     */
     private fun testNetworkConnection() {
         try {
             Log.d(TAG, "Network bağlantısı test ediliyor...")
@@ -179,4 +147,13 @@ class WebSocketService @Inject constructor() {
             Log.e(TAG, "Server $SERVER_IP:$SERVER_PORT erişilemez")
         }
     }
-} 
+
+    // Herhangi bir raw websocket mesajı backend'e gönderir (GetControlList, UpdateControlValue...)
+    fun sendRawMessage(msg: String) {
+        try {
+            webSocketClient?.send(msg)
+        } catch (e: Exception) {
+            Log.e(TAG, "Raw mesaj gönderme hatası: ${e.message}")
+        }
+    }
+}

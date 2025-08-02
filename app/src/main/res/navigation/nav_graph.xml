@@ -28,6 +28,15 @@
         android:id="@+id/homeFragment"
         android:name="com.example.inohomsmarthomesystems.ui.home.HomeFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_lightingFragment"
+            app:destination="@id/lightingFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/lightingFragment"
+        android:name="com.example.inohomsmarthomesystems.ui.lighting.LightingFragment"
+        android:label="fragment_lighting"
+        tools:layout="@layout/fragment_lighting" />
 
 </navigation>
