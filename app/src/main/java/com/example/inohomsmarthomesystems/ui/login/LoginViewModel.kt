@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.inohomsmarthomesystems.data.remote.WebSocketService
 import com.example.inohomsmarthomesystems.data.model.AuthenticationResponse
+import com.example.inohomsmarthomesystems.utils.Constants
 import com.example.inohomsmarthomesystems.utils.state.ConnectionState
 import com.example.inohomsmarthomesystems.utils.state.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -55,7 +56,7 @@ class LoginViewModel @Inject constructor(
         when (state) {
             ConnectionState.CONNECTED -> {
                 // Bağlantı kuruldu, authentication request gönder
-                webSocketService.sendAuthenticationRequest("admin", "admin")
+                webSocketService.sendAuthenticationRequest(Constants.USERNAME, Constants.PASSWORD)
             }
             ConnectionState.ERROR -> {
                 // Bağlantı hatası, UI state'i Error olarak güncelle
