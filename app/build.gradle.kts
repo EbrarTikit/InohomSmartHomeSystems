@@ -67,10 +67,10 @@ dependencies {
     ksp(libs.hilt.compiler)
     
     // WebSocket
-    implementation("org.java-websocket:Java-WebSocket:1.5.3")
+    implementation(libs.java.websocket)
     
     // JSON
-    implementation("com.google.code.gson:gson:2.10.1")
+    implementation(libs.gson)
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

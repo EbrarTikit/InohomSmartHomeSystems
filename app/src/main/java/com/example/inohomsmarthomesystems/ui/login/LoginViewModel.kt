@@ -23,7 +23,8 @@ class LoginViewModel @Inject constructor(
     
     private val _connectionState = MutableStateFlow(ConnectionState.DISCONNECTED)
     val connectionState: StateFlow<ConnectionState> = _connectionState
-    
+
+    // ViewModel ilk oluştuğunda: WebSocket state ve authentication state flow'larını gözlemler
     init {
         viewModelScope.launch {
             webSocketService.connectionState.collectLatest { state ->
@@ -49,15 +50,19 @@ class LoginViewModel @Inject constructor(
         webSocketService.connect()
     }
 
+    // Bağlantı durumuna göre authentication request gönderir veya hata döner
     private fun handleConnectionStateChange(state: ConnectionState) {
         when (state) {
             ConnectionState.CONNECTED -> {
-                webSocketService.sendAuthenticationRequest("demo", "123456")
+                // Bağlantı kuruldu, authentication request gönder
+                webSocketService.sendAuthenticationRequest("admin", "admin")
             }
             ConnectionState.ERROR -> {
+                // Bağlantı hatası, UI state'i Error olarak güncelle
                 _uiState.value = UIState.Error("WebSocket bağlantı hatası")
             }
             ConnectionState.DISCONNECTED -> {
+                // Bağlantı kesildi, UI state'i Error olarak güncelle
                 if (_uiState.value is UIState.Loading) {
                     _uiState.value = UIState.Error("Bağlantı kesildi")
                 }
@@ -65,15 +70,17 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    
     private fun startConnectionTimeout() {
         viewModelScope.launch {
-            kotlinx.coroutines.delay(10000)
+            kotlinx.coroutines.delay(20000)
             if (_uiState.value is UIState.Loading) {
                 _uiState.value = UIState.Error("Bağlantı zaman aşımı")
             }
         }
     }
 
+    // Authentication cevabı geldiğinde başarıyla veya hatayla UI state güncellenir
     private fun handleAuthenticationResponse(response: AuthenticationResponse?) {
         response?.let { authResponse ->
             if (authResponse.error == null && authResponse.method == "OnAuthenticated") {

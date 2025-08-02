@@ -49,10 +49,9 @@ class LoginFragment : Fragment() {
         binding.btnAccounts.startAnimation(animation)
     }
 
+    // 'Hesaplar' butonuna tıklanınca authentication akışı tetiklenir
     private fun setupClickListeners() {
-        binding.btnAccounts.setOnClickListener {
-            // Hesaplar butonuna tıklandığında authentication işlemini başlat
-            viewModel.onAccountsButtonClicked()
+        binding.btnAccounts.setOnClickListener { viewModel.onAccountsButtonClicked()
         }
     }
 
@@ -70,6 +69,7 @@ class LoginFragment : Fragment() {
         }
     }
 
+    // UIState durumlarına uygun olarak buton ve mesajları günceller
     private fun handleUiState(state: UIState<String>) {
         when (state) {
             is UIState.Idle -> {
